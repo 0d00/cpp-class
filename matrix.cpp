@@ -8,6 +8,7 @@ matrix::matrix()
   rows = 1;
   columns = 1;
   float *data = new float[1];
+  data[0]=0;
   memoryNumber = 0;
 }
 matrix::matrix(int row, int col, float *data)
@@ -52,56 +53,53 @@ void matrix::setData(float *other)
 }
 matrix matrix::operator*(const matrix other) const
 {
-  matrix result;
-  result.rows = this->rows;
-  result.columns = other.columns;
-  result.data = new float[columns * rows];
+
+  float *temp = new float[other.columns * this->rows];
+  memset(temp,0,other.columns * this->rows);
   for (int i = 0; i < this->rows; i++)
   {
     for (int j = 0; j < other.columns; j++)
     {
       for (int k = 0; k < this->columns; k++)
       {
-        result.data[i * result.columns + j] += this->data[i * this->columns + k] * other.data[other.columns * k + j];
+        temp[i * other.columns + j] += this->data[i * this->columns + k] * other.data[other.columns * k + j];
       }
     }
   }
-  return result;
+  return matrix(this->rows, other.columns, temp);
 }
 matrix matrix::operator+(matrix other) const
 {
-  matrix result;
-  result.rows = this->rows;
-  result.columns = other.columns;
-  result.data = new float[result.rows * result.columns];
-  for (int i = 0; i < result.rows * result.columns; i++)
+
+  float *temp = new float[this->rows * this->columns];
+  memset(temp,0,other.columns * this->rows);
+  for (int i = 0; i < other.rows * other.columns; i++)
   {
-    result.data[i] = this->data[i] + other.data[i];
+    temp[i] = this->data[i] + other.data[i];
   }
 
-  return result;
+  return matrix(other.rows, other.columns, temp);
 }
 matrix matrix::operator-(matrix other) const
 {
-  matrix result;
-  result.rows = this->rows;
-  result.columns = other.columns;
-  result.data = new float[result.rows * result.columns];
-  for (int i = 0; i < result.rows * result.columns; i++)
+  float *temp = new float[this->rows * this->columns];
+  memset(temp,0,other.columns * this->rows);
+  for (int i = 0; i < other.rows * other.columns; i++)
   {
-    result.data[i] = this->data[i] - other.data[i];
+    temp[i] = this->data[i] - other.data[i];
   }
-  return result;
+
+  return matrix(other.rows, other.columns, temp);
 }
-matrix &matrix::operator=(matrix other)
+matrix &matrix::operator=(matrix other) 
 {
-  this->~matrix();
+
   this->columns = other.columns;
   this->rows = other.rows;
 
   this->data = other.data;
   other.memoryNumber++;
-  cout << "=" << memoryNumber << endl;
+
   return *this;
 }
 matrix::~matrix()
@@ -109,7 +107,6 @@ matrix::~matrix()
   if (this->memoryNumber != 0)
   {
     this->memoryNumber--;
-    cout << "-" << memoryNumber << endl;
   }
   else
   {
@@ -121,7 +118,16 @@ ostream &operator<<(ostream &os, const matrix &other)
 {
   for (int i = 0; i < other.rows * other.columns; i++)
   {
-    cout << other.data[i] << " ";
+    cout << other.data[i] << " "<<endl;
   }
   return os;
+}
+matrix operator*(float c,matrix other){
+  float *temp=new float[other.rows*other.columns];
+  memset(temp,0,other.rows*other.columns);
+  for (int i = 0; i <other.rows*other.columns; i++)
+  {
+    temp[i]=c*other.data[i];
+  }
+  return matrix(other.rows,other.columns,temp);
 }
