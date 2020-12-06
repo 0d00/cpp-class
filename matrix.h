@@ -24,5 +24,6 @@ public:
     matrix operator-(matrix) const;
     ~matrix();
     friend ostream& operator<<(ostream&,const matrix&);
+    friend matrix operator*(float,const matrix) ;
 };
 
